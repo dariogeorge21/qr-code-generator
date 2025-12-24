@@ -192,6 +192,21 @@ await toCanvas(canvas, inputValue, {
 />
 ```
 
+### UPI Payment URL Format
+
+The application generates UPI payment URLs in the standard format:
+```
+upi://pay?pa=<UPI_ID>&pn=<PAYEE_NAME>&am=<AMOUNT>&cu=INR&tn=<TRANSACTION_NOTE>
+```
+
+- `pa`: Payment address (UPI ID) - Required
+- `pn`: Payee name - Optional
+- `am`: Amount in rupees - Optional (if omitted, allows any amount)
+- `cu`: Currency (always INR) - Added when amount is specified
+- `tn`: Transaction note - Optional
+
+The amount is formatted to 2 decimal places (e.g., `10000` becomes `10000.00`) to ensure compatibility with UPI payment systems.
+
 ## 🐛 Troubleshooting
 
 ### Build Errors
@@ -204,6 +219,12 @@ npm run build
 
 ### Download Not Working
 Ensure your browser allows downloads and pop-ups are not blocked.
+
+### UPI QR Code Not Working
+- Ensure you've entered a valid UPI ID in the correct format (e.g., `yourname@paytm`)
+- Verify the amount is entered correctly (supports values like 10000, 100000, etc.)
+- Test the QR code with a UPI app to ensure it scans correctly
+- Make sure all required fields (UPI ID) are filled before generating
 
 ## 📝 License
 
@@ -219,6 +240,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 - [react-qr-code](https://www.npmjs.com/package/react-qr-code) for the React QR code component
 - [qrcode](https://www.npmjs.com/package/qrcode) for QR code generation
 - [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
+- UPI (Unified Payments Interface) for the payment system specification
 
 ---
 
