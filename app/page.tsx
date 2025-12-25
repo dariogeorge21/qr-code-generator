@@ -23,22 +23,27 @@ export default function Home() {
     setError('');
   };
 
-  // Generate UPI payment URL
-  const generateUPIUrl = (): string => {
-    if (!upiId.trim()) {
+  // Generate UPI payment URL with explicit parameters to avoid state timing issues
+  const generateUPIUrl = (upiIdValue?: string, payeeNameValue?: string, amountValue?: string, transactionNoteValue?: string): string => {
+    const currentUpiId = upiIdValue !== undefined ? upiIdValue : upiId;
+    const currentPayeeName = payeeNameValue !== undefined ? payeeNameValue : payeeName;
+    const currentAmount = amountValue !== undefined ? amountValue : amount;
+    const currentTransactionNote = transactionNoteValue !== undefined ? transactionNoteValue : transactionNote;
+    
+    if (!currentUpiId.trim()) {
       return '';
     }
     
     const params = new URLSearchParams();
-    params.set('pa', upiId.trim());
+    params.set('pa', currentUpiId.trim());
     
-    if (payeeName.trim()) {
-      params.set('pn', payeeName.trim());
+    if (currentPayeeName.trim()) {
+      params.set('pn', currentPayeeName.trim());
     }
     
-    if (amount.trim()) {
+    if (currentAmount.trim()) {
       // Parse and validate the amount to ensure accuracy
-      const trimmedAmount = amount.trim();
+      const trimmedAmount = currentAmount.trim();
       // Remove any non-numeric characters except decimal point
       const cleanedAmount = trimmedAmount.replace(/[^\d.]/g, '');
       
@@ -55,16 +60,16 @@ export default function Home() {
       }
     }
     
-    if (transactionNote.trim()) {
-      params.set('tn', transactionNote.trim());
+    if (currentTransactionNote.trim()) {
+      params.set('tn', currentTransactionNote.trim());
     }
     
     return `upi://pay?${params.toString()}`;
   };
 
   // Update input value when UPI fields change
-  const handleUPIFieldChange = () => {
-    const upiUrl = generateUPIUrl();
+  const handleUPIFieldChange = (upiIdValue?: string, payeeNameValue?: string, amountValue?: string, transactionNoteValue?: string) => {
+    const upiUrl = generateUPIUrl(upiIdValue, payeeNameValue, amountValue, transactionNoteValue);
     setInputValue(upiUrl);
     setError('');
   };
@@ -215,8 +220,9 @@ export default function Home() {
                       type="text"
                       value={upiId}
                       onChange={(e) => {
-                        setUpiId(e.target.value);
-                        handleUPIFieldChange();
+                        const newValue = e.target.value;
+                        setUpiId(newValue);
+                        handleUPIFieldChange(newValue, payeeName, amount, transactionNote);
                       }}
                       placeholder="yourname@paytm or yourname@ybl or yourname@phonepe"
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all"
@@ -237,8 +243,9 @@ export default function Home() {
                       type="text"
                       value={payeeName}
                       onChange={(e) => {
-                        setPayeeName(e.target.value);
-                        handleUPIFieldChange();
+                        const newValue = e.target.value;
+                        setPayeeName(newValue);
+                        handleUPIFieldChange(upiId, newValue, amount, transactionNote);
                       }}
                       placeholder="Your Name or Business Name"
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all"
@@ -263,19 +270,16 @@ export default function Home() {
                           // This ensures we preserve the exact value entered
                           if (value === '' || /^\d*\.?\d*$/.test(value)) {
                             setAmount(value);
-                            handleUPIFieldChange();
+                            // Pass the new value directly to avoid state timing issues
+                            handleUPIFieldChange(upiId, payeeName, value, transactionNote);
                           }
                         }}
                         onBlur={(e) => {
-                          // Validate and format on blur, but preserve exact input while typing
+                          // Validate on blur and regenerate URL with current state
                           const value = e.target.value.trim();
                           if (value && !isNaN(Number(value)) && Number(value) > 0) {
-                            // Only format if it's a valid number, but keep original precision
-                            const numValue = Number(value);
-                            if (numValue > 0 && isFinite(numValue)) {
-                              // Don't change the value, just ensure it's valid
-                              // The formatting happens in generateUPIUrl
-                            }
+                            // Ensure the URL is regenerated with the final value
+                            handleUPIFieldChange();
                           }
                         }}
                         placeholder="100.00"
@@ -297,8 +301,9 @@ export default function Home() {
                         type="text"
                         value={transactionNote}
                         onChange={(e) => {
-                          setTransactionNote(e.target.value);
-                          handleUPIFieldChange();
+                          const newValue = e.target.value;
+                          setTransactionNote(newValue);
+                          handleUPIFieldChange(upiId, payeeName, amount, newValue);
                         }}
                         placeholder="Payment for..."
                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all"
