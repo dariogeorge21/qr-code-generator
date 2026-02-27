@@ -9,8 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "QR Code Generator",
-  description: "Generate QR codes for text, URLs, or numbers instantly. Download as PNG or SVG.",
+  title: "QR Code Studio — Multi-Level Customizable QR Generator",
+  description:
+    "Generate fully customizable QR codes with dot styles, eye patterns, gradients, logos, background text, titles, captions, and more. Export as PNG, SVG, JPEG, or WebP.",
 };
 
 export default function RootLayout({
