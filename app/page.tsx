@@ -1,8 +1,30 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, CSSProperties, ChangeEvent } from 'react';
 import QRCode from 'react-qr-code';
 import { toCanvas } from 'qrcode';
+
+const DESIGN_PALETTES = [
+  { name: 'Classic',   fg: '#000000', bg: '#FFFFFF' },
+  { name: 'Ocean',     fg: '#0C4A6E', bg: '#E0F2FE' },
+  { name: 'Sunset',    fg: '#9A3412', bg: '#FFF7ED' },
+  { name: 'Forest',    fg: '#14532D', bg: '#F0FDF4' },
+  { name: 'Berry',     fg: '#701A75', bg: '#FDF4FF' },
+  { name: 'Midnight',  fg: '#1E1B4B', bg: '#EEF2FF' },
+  { name: 'Rose',      fg: '#9F1239', bg: '#FFF1F2' },
+  { name: 'Amber',     fg: '#78350F', bg: '#FFFBEB' },
+  { name: 'Teal',      fg: '#134E4A', bg: '#F0FDFA' },
+  { name: 'Slate',     fg: '#1E293B', bg: '#F8FAFC' },
+  { name: 'Neon',      fg: '#00FF41', bg: '#0A0A0A' },
+  { name: 'Cyber',     fg: '#FF00FF', bg: '#0D0221' },
+  { name: 'Retro',     fg: '#FF6B35', bg: '#FFF8F0' },
+  { name: 'Mono',      fg: '#333333', bg: '#F5F5F5' },
+  { name: 'Coral',     fg: '#BE185D', bg: '#FDF2F8' },
+  { name: 'Ice',       fg: '#155E75', bg: '#ECFEFF' },
+];
+
+type CornerStyle = 'square' | 'classy' | 'rounded' | 'dots';
+type FrameStyle  = 'none' | 'simple' | 'rounded' | 'badge' | 'shadow';
 
 export default function Home() {
   const [mode, setMode] = useState<'general' | 'upi'>('general');
@@ -19,7 +41,77 @@ export default function Home() {
   const [qrLabel, setQrLabel] = useState('');
   const [showLabel, setShowLabel] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Design customization
+  const [showDesignPanel, setShowDesignPanel] = useState(false);
+  const [fgColor, setFgColor] = useState('#000000');
+  const [bgColor, setBgColor] = useState('#FFFFFF');
+  const [qrSize, setQrSize] = useState(256);
+  const [cornerStyle, setCornerStyle] = useState<CornerStyle>('square');
+  const [frameStyle, setFrameStyle] = useState<FrameStyle>('none');
+  const [activePalette, setActivePalette] = useState('Classic');
+
+  const applyPalette = (palette: (typeof DESIGN_PALETTES)[number]) => {
+    setFgColor(palette.fg);
+    setBgColor(palette.bg);
+    setActivePalette(palette.name);
+  };
+
+  const randomizePalette = () => {
+    applyPalette(DESIGN_PALETTES[Math.floor(Math.random() * DESIGN_PALETTES.length)]);
+  };
+
+  const generateRandomColor = () => {
+    const hue  = Math.floor(Math.random() * 360);
+    const sat  = Math.floor(Math.random() * 40) + 60;
+    const fgL  = Math.floor(Math.random() * 30) + 10;
+    const bgL  = Math.floor(Math.random() * 20) + 80;
+    const hslToHex = (h: number, s: number, l: number) => {
+      l /= 100;
+      const a = (s * Math.min(l, 1 - l)) / 100;
+      const f = (n: number) => {
+        const k     = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    };
+    setFgColor(hslToHex(hue, sat, fgL));
+    setBgColor(hslToHex(hue, sat / 3, bgL));
+    setActivePalette('Custom');
+  };
+
+  const getCornerRadius = (): number => {
+    switch (cornerStyle) {
+      case 'classy':  return 6;
+      case 'rounded': return 12;
+      case 'dots':    return 20;
+      default:        return 0;
+    }
+  };
+
+  const getFrameContainerStyle = (): CSSProperties => {
+    const r    = getCornerRadius();
+    const base: CSSProperties = {
+      backgroundColor: bgColor,
+      borderRadius: r > 0 ? `${r + 6}px` : '6px',
+      padding: '20px',
+      transition: 'all 0.3s',
+    };
+    switch (frameStyle) {
+      case 'simple':
+        return { ...base, border: `3px solid ${fgColor}50` };
+      case 'rounded':
+        return { ...base, border: `3px solid ${fgColor}50`, borderRadius: '20px' };
+      case 'badge':
+        return { ...base, boxShadow: `0 0 0 4px ${bgColor}, 0 0 0 8px ${fgColor}50` };
+      case 'shadow':
+        return { ...base, boxShadow: `0 20px 60px -10px ${fgColor}40` };
+      default:
+        return base;
+    }
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
     setError('');
@@ -116,18 +208,43 @@ export default function Home() {
     setIsGenerating(true);
     try {
       if (format === 'png') {
-        // Create a canvas element for PNG generation
         const canvas = document.createElement('canvas');
+        const downloadSize = Math.max(qrSize * 2, 512);
         await toCanvas(canvas, inputValue, {
-          width: 512,
+          width: downloadSize,
           margin: 2,
-          color: {
-            dark: '#000000',
-            light: '#FFFFFF',
-          },
+          color: { dark: fgColor, light: bgColor },
         });
 
-        // Convert canvas to blob and download
+        // Apply corner radius clipping if needed
+        if (cornerStyle !== 'square') {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const tmp  = document.createElement('canvas');
+            tmp.width  = canvas.width;
+            tmp.height = canvas.height;
+            const tCtx = tmp.getContext('2d')!;
+            const r    = getCornerRadius() * (downloadSize / 256);
+            tCtx.beginPath();
+            tCtx.moveTo(r, 0);
+            tCtx.lineTo(tmp.width - r, 0);
+            tCtx.quadraticCurveTo(tmp.width, 0, tmp.width, r);
+            tCtx.lineTo(tmp.width, tmp.height - r);
+            tCtx.quadraticCurveTo(tmp.width, tmp.height, tmp.width - r, tmp.height);
+            tCtx.lineTo(r, tmp.height);
+            tCtx.quadraticCurveTo(0, tmp.height, 0, tmp.height - r);
+            tCtx.lineTo(0, r);
+            tCtx.quadraticCurveTo(0, 0, r, 0);
+            tCtx.closePath();
+            tCtx.clip();
+            tCtx.drawImage(canvas, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(tmp, 0, 0);
+          }
+        }
+
         canvas.toBlob((blob) => {
           if (blob) {
             const url = URL.createObjectURL(blob);
@@ -174,7 +291,7 @@ export default function Home() {
               QR Code Generator
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Generate QR codes for text, URLs, numbers, or UPI payments instantly
+              Generate custom-designed QR codes with colors, styles &amp; palettes
             </p>
           </div>
 
@@ -207,7 +324,7 @@ export default function Home() {
             </div>
 
             {/* Input Section */}
-            <div className="mb-8">
+            <div className="mb-6">
               {mode === 'upi' ? (
                 <div className="space-y-4">
                   <div>
@@ -359,6 +476,184 @@ export default function Home() {
               )}
             </div>
 
+            {/* ── Design Customization Panel ── */}
+            <div className="mb-6 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setShowDesignPanel(!showDesignPanel)}
+                className="w-full px-5 py-3.5 flex items-center justify-between bg-gray-50 dark:bg-gray-750 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+              >
+                <span className="font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  🎨 Customize Design
+                  {activePalette !== 'Classic' && (
+                    <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full">
+                      {activePalette}
+                    </span>
+                  )}
+                </span>
+                <svg
+                  className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${showDesignPanel ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showDesignPanel && (
+                <div className="p-5 space-y-6 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+
+                  {/* Color Pickers */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Colors</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">QR Color</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color" value={fgColor}
+                            onChange={(e) => { setFgColor(e.target.value); setActivePalette('Custom'); }}
+                            className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 cursor-pointer"
+                          />
+                          <input
+                            type="text" value={fgColor}
+                            onChange={(e) => { setFgColor(e.target.value); setActivePalette('Custom'); }}
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Background</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color" value={bgColor}
+                            onChange={(e) => { setBgColor(e.target.value); setActivePalette('Custom'); }}
+                            className="w-10 h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 cursor-pointer"
+                          />
+                          <input
+                            type="text" value={bgColor}
+                            onChange={(e) => { setBgColor(e.target.value); setActivePalette('Custom'); }}
+                            className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        onClick={generateRandomColor}
+                        className="px-3 py-1.5 text-xs font-medium bg-gradient-to-r from-pink-500 to-violet-500 text-white rounded-lg hover:from-pink-600 hover:to-violet-600 transition-all active:scale-95"
+                      >
+                        🎲 Random Colors
+                      </button>
+                      <button
+                        onClick={() => { setFgColor('#000000'); setBgColor('#FFFFFF'); setActivePalette('Classic'); }}
+                        className="px-3 py-1.5 text-xs font-medium bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-all active:scale-95"
+                      >
+                        ↩ Reset
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Palette Swatches */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Design Palettes</h3>
+                      <button onClick={randomizePalette} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium">
+                        🔀 Random
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-8 gap-2">
+                      {DESIGN_PALETTES.map((palette) => (
+                        <button
+                          key={palette.name}
+                          onClick={() => applyPalette(palette)}
+                          title={palette.name}
+                          className={`group relative w-full aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-110 ${
+                            activePalette === palette.name
+                              ? 'border-blue-500 ring-2 ring-blue-300 dark:ring-blue-700 scale-110'
+                              : 'border-gray-200 dark:border-gray-600 hover:border-gray-400'
+                          }`}
+                        >
+                          <div className="absolute inset-0" style={{ backgroundColor: palette.bg }} />
+                          <div className="absolute inset-[5px] rounded-sm" style={{ backgroundColor: palette.fg }} />
+                          <span className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/60 text-white text-[7px] font-bold transition-opacity leading-tight text-center px-0.5">
+                            {palette.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Corner Style */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Corner Style</h3>
+                    <div className="grid grid-cols-4 gap-2">
+                      {([
+                        { key: 'square',  label: 'Square',  icon: '◻' },
+                        { key: 'classy',  label: 'Classy',  icon: '▫' },
+                        { key: 'rounded', label: 'Rounded', icon: '⬜' },
+                        { key: 'dots',    label: 'Pill',    icon: '⭕' },
+                      ] as const).map((s) => (
+                        <button
+                          key={s.key}
+                          onClick={() => setCornerStyle(s.key)}
+                          className={`px-3 py-2.5 rounded-lg border-2 text-xs font-medium transition-all duration-200 ${
+                            cornerStyle === s.key
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                              : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400'
+                          }`}
+                        >
+                          <span className="block text-lg mb-0.5">{s.icon}</span>
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Frame Style */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Frame Style</h3>
+                    <div className="grid grid-cols-5 gap-2">
+                      {([
+                        { key: 'none',    label: 'None',    icon: '✖' },
+                        { key: 'simple',  label: 'Border',  icon: '🔲' },
+                        { key: 'rounded', label: 'Rounded', icon: '⬜' },
+                        { key: 'badge',   label: 'Badge',   icon: '🏷' },
+                        { key: 'shadow',  label: 'Shadow',  icon: '🌑' },
+                      ] as const).map((s) => (
+                        <button
+                          key={s.key}
+                          onClick={() => setFrameStyle(s.key)}
+                          className={`px-2 py-2.5 rounded-lg border-2 text-xs font-medium transition-all duration-200 ${
+                            frameStyle === s.key
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                              : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-400'
+                          }`}
+                        >
+                          <span className="block text-lg mb-0.5">{s.icon}</span>
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Size Slider */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                      Preview Size: <span className="text-blue-600 dark:text-blue-400">{qrSize}px</span>
+                    </h3>
+                    <input
+                      type="range" min="128" max="400" step="8" value={qrSize}
+                      onChange={(e) => setQrSize(Number(e.target.value))}
+                      className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                    />
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>128px</span><span>400px</span>
+                    </div>
+                  </div>
+
+                </div>
+              )}
+            </div>
+
             {/* Optional QR Label */}
             <div className="mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
               <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -404,15 +699,16 @@ export default function Home() {
                 <div className="flex flex-col items-center">
                   <div
                     ref={qrRef}
-                    className="bg-white p-6 rounded-xl shadow-inner border-2 border-gray-200 dark:border-gray-700 transition-all duration-300"
+                    className="transition-all duration-300"
+                    style={getFrameContainerStyle()}
                   >
                     <QRCode
                       value={inputValue}
-                      size={256}
+                      size={qrSize}
                       style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
                       viewBox="0 0 256 256"
-                      fgColor="#000000"
-                      bgColor="#FFFFFF"
+                      fgColor={fgColor}
+                      bgColor={bgColor}
                     />
                   </div>
                   {showLabel && qrLabel.trim() ? (
