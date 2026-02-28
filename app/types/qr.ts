@@ -8,7 +8,7 @@ export type DotType =
 
 export type CornerSquareType = 'square' | 'dot' | 'extra-rounded';
 export type CornerDotType = 'square' | 'dot';
-export type BorderType = 'solid' | 'dashed' | 'dotted' | 'double';
+export type BorderType = 'solid' | 'dashed' | 'dotted' | 'double' | 'groove' | 'ridge' | 'inset' | 'outset';
 export type ExportFormat = 'png' | 'svg' | 'jpeg' | 'webp';
 export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 export type TextAlign = 'left' | 'center' | 'right';

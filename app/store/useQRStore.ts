@@ -42,12 +42,22 @@ export interface QRState {
   borderColor: string;
   borderRadius: number;
   borderType: BorderType;
+  borderOpacity: number;
+  individualCorners: boolean;
+  borderTopLeftRadius: number;
+  borderTopRightRadius: number;
+  borderBottomRightRadius: number;
+  borderBottomLeftRadius: number;
+  frameBgEnabled: boolean;
+  frameBgColor: string;
   padding: number;
   shadowEnabled: boolean;
   shadowX: number;
   shadowY: number;
   shadowBlur: number;
+  shadowSpread: number;
   shadowColor: string;
+  shadowInset: boolean;
 
   // ── Background Text ──
   bgText: string;
@@ -138,12 +148,22 @@ const initialState: QRState = {
   borderColor: '#00000030',
   borderRadius: 12,
   borderType: 'solid',
+  borderOpacity: 100,
+  individualCorners: false,
+  borderTopLeftRadius: 12,
+  borderTopRightRadius: 12,
+  borderBottomRightRadius: 12,
+  borderBottomLeftRadius: 12,
+  frameBgEnabled: false,
+  frameBgColor: '#f0f0f0',
   padding: 20,
   shadowEnabled: false,
   shadowX: 0,
   shadowY: 4,
   shadowBlur: 20,
+  shadowSpread: 0,
   shadowColor: '#00000025',
+  shadowInset: false,
 
   bgText: '',
   bgTextFontFamily: 'Inter',

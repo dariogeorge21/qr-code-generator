@@ -26,12 +26,22 @@ export default function QRPreviewCanvas() {
   const borderColor = useQRStore((s) => s.borderColor);
   const borderRadius = useQRStore((s) => s.borderRadius);
   const borderType = useQRStore((s) => s.borderType);
+  const borderOpacity = useQRStore((s) => s.borderOpacity);
+  const individualCorners = useQRStore((s) => s.individualCorners);
+  const borderTopLeftRadius = useQRStore((s) => s.borderTopLeftRadius);
+  const borderTopRightRadius = useQRStore((s) => s.borderTopRightRadius);
+  const borderBottomRightRadius = useQRStore((s) => s.borderBottomRightRadius);
+  const borderBottomLeftRadius = useQRStore((s) => s.borderBottomLeftRadius);
+  const frameBgEnabled = useQRStore((s) => s.frameBgEnabled);
+  const frameBgColor = useQRStore((s) => s.frameBgColor);
   const padding = useQRStore((s) => s.padding);
   const shadowEnabled = useQRStore((s) => s.shadowEnabled);
   const shadowX = useQRStore((s) => s.shadowX);
   const shadowY = useQRStore((s) => s.shadowY);
   const shadowBlur = useQRStore((s) => s.shadowBlur);
+  const shadowSpread = useQRStore((s) => s.shadowSpread);
   const shadowColor = useQRStore((s) => s.shadowColor);
+  const shadowInset = useQRStore((s) => s.shadowInset);
   const bgText = useQRStore((s) => s.bgText);
   const bgTextFontFamily = useQRStore((s) => s.bgTextFontFamily);
   const bgTextFontSize = useQRStore((s) => s.bgTextFontSize);
@@ -146,19 +156,26 @@ export default function QRPreviewCanvas() {
 
   // Frame container style
   const frameStyle: CSSProperties = {
-    backgroundColor: transparentBg ? 'transparent' : bgColor,
+    backgroundColor: frameBgEnabled
+      ? frameBgColor
+      : transparentBg
+        ? 'transparent'
+        : bgColor,
     padding: `${padding}px`,
-    borderRadius: `${borderRadius}px`,
+    borderRadius: individualCorners
+      ? `${borderTopLeftRadius}px ${borderTopRightRadius}px ${borderBottomRightRadius}px ${borderBottomLeftRadius}px`
+      : `${borderRadius}px`,
     transition: 'all 0.2s ease',
     ...(frameEnabled
       ? {
           borderWidth: `${borderWidth}px`,
           borderStyle: borderType,
           borderColor: borderColor,
+          opacity: borderOpacity / 100,
         }
       : {}),
     ...(shadowEnabled
-      ? { boxShadow: `${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowColor}` }
+      ? { boxShadow: `${shadowInset ? 'inset ' : ''}${shadowX}px ${shadowY}px ${shadowBlur}px ${shadowSpread}px ${shadowColor}` }
       : {}),
   };
 
