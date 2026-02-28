@@ -94,7 +94,7 @@ export default function QRPreviewCanvas() {
         color: useCustomEyeColors ? cornerDotColor : fgColor,
       },
       backgroundOptions: {
-        color: transparentBg ? 'transparent' : bgColor,
+        color: 'transparent',
       },
       ...(logoImage
         ? {
@@ -236,7 +236,7 @@ export default function QRPreviewCanvas() {
                 color: bgTextColor,
                 opacity: bgTextOpacity,
                 whiteSpace: 'nowrap',
-                zIndex: 0,
+                zIndex: 1,
               }}
             >
               {bgText}
@@ -245,7 +245,7 @@ export default function QRPreviewCanvas() {
 
           {/* Background text - repeat watermark */}
           {bgText && bgTextRepeat && (
-            <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" style={{ zIndex: 0 }}>
+            <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" style={{ zIndex: 1 }}>
               {Array.from({ length: 7 }).map((_, row) =>
                 Array.from({ length: 5 }).map((_, col) => (
                   <div
@@ -269,7 +269,7 @@ export default function QRPreviewCanvas() {
           )}
 
           {/* QR Code */}
-          <div ref={qrContainerRef} className="relative" style={{ zIndex: 1 }}>
+          <div ref={qrContainerRef} className="relative" style={{ zIndex: 2 }}>
             {!loaded && (
               <div
                 className="flex items-center justify-center bg-gray-100 dark:bg-gray-700 animate-pulse rounded-lg"
