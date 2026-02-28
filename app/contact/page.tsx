@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Github, Linkedin, Send, CheckCircle } from 'lucide-react';
+import { Mail, Github, Linkedin, Send, CheckCircle, AlertCircle } from 'lucide-react';
 
 const SOCIAL = [
   {
@@ -28,23 +28,40 @@ export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const inputClass =
     'w-full px-4 py-3 text-sm border border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 outline-none bg-[var(--color-background)] text-[var(--color-text)] placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200';
   const labelClass = 'block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider';
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.name || !form.email || !form.message) return;
-    setLoading(true);
-    // Simulate submission — wire up a real backend/formspree/resend here
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-    }, 1000);
-  };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!form.name || !form.email || !form.message) return;
+  
+  setLoading(true);
+  setError('');
 
-  return (
+  try {
+    const response = await fetch('/api/contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit form');
+    }
+
+    setSubmitted(true);
+    setForm({ name: '', email: '', subject: '', message: '' });
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'An error occurred');
+  } finally {
+    setLoading(false);
+  }
+};
+
+return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-14">
       {/* Header */}
       <div className="text-center mb-12">
@@ -60,6 +77,15 @@ export default function ContactPage() {
         {/* Contact form */}
         <div className="lg:col-span-3">
           <div className="p-6 sm:p-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-background)] shadow-sm">
+            {error && (
+              <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-red-900 dark:text-red-200">Error</p>
+                  <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
+                </div>
+              </div>
+            )}
             {submitted ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="w-16 h-16 rounded-full bg-green-50 dark:bg-green-900/30 flex items-center justify-center mb-4">
