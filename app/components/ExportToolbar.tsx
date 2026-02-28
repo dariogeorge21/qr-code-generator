@@ -140,19 +140,58 @@ async function compositeExport(): Promise<{ blob: Blob; filename: string }> {
     ctx.restore();
   }
 
-  // Watermark overlay — drawn after QR so it appears ON TOP.
-  // CRITICAL: coordinates must be relative to the QR frame area (innerW × innerH),
-  // offset by (wmX, wmY), to match the preview canvas coordinate system exactly.
+  // Watermark overlay — drawn using an off-screen canvas to perfectly match the preview's DOM behavior.
   if (s.bgText) {
-    // QR frame area boundaries (same box the preview watermark canvas covers)
+    // QR frame area boundaries
     const wmX = bw;
     const wmY = bw + titleH + titleGap;
-    const wmW = innerW;   // qrPx + pad*2  (matches preview: qrSize + padding*2 scaled)
-    const wmH = innerH;   // same
+    const wmW = innerW;
+    const wmH = innerH;
 
+    // 1. Create an isolated off-screen canvas (just like the preview's absolute canvas)
+    const wmCanvas = document.createElement('canvas');
+    wmCanvas.width = wmW;
+    wmCanvas.height = wmH;
+    const wmCtx = wmCanvas.getContext('2d')!;
+
+    // 2. Draw the text onto the isolated canvas
+    wmCtx.globalAlpha = s.bgTextOpacity;
+    wmCtx.globalCompositeOperation = (s.bgTextBlendMode === 'normal' ? 'source-over' : s.bgTextBlendMode) as GlobalCompositeOperation;
+    wmCtx.font = `${s.bgTextFontWeight} ${s.bgTextFontSize * scale}px ${s.bgTextFontFamily}`;
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ('letterSpacing' in wmCtx) (wmCtx as any).letterSpacing = `${s.bgTextLetterSpacing * scale}px`;
+    wmCtx.fillStyle = s.bgTextColor;
+
+    let displayText = s.bgText;
+    if (s.bgTextTextTransform === 'uppercase') displayText = s.bgText.toUpperCase();
+    else if (s.bgTextTextTransform === 'lowercase') displayText = s.bgText.toLowerCase();
+    else if (s.bgTextTextTransform === 'capitalize') displayText = s.bgText.replace(/\b\w/g, (c) => c.toUpperCase());
+
+    if (s.bgTextRepeat) {
+      const tw = wmCtx.measureText(displayText).width + 30 * scale;
+      const th = s.bgTextFontSize * scale * 1.8;
+      wmCtx.translate(wmW / 2, wmH / 2);
+      wmCtx.rotate((s.bgTextRotation * Math.PI) / 180);
+      for (let y = -wmH * 1.5; y < wmH * 1.5; y += th) {
+        for (let x = -wmW * 1.5; x < wmW * 1.5; x += tw) {
+          wmCtx.fillText(displayText, x, y);
+        }
+      }
+    } else {
+      const tx = (s.bgTextX / 100) * wmW;
+      const ty = (s.bgTextY / 100) * wmH;
+      wmCtx.translate(tx, ty);
+      wmCtx.rotate((s.bgTextRotation * Math.PI) / 180);
+      wmCtx.textAlign = 'center';
+      wmCtx.textBaseline = 'middle';
+      wmCtx.fillText(displayText, 0, 0);
+    }
+
+    // 3. Stamp the isolated watermark canvas onto the main export canvas
     ctx.save();
-
-    // Clip to the QR frame area — watermark must not bleed into title/caption
+    
+    // Clip to the QR frame area so it doesn't bleed into the title/caption
     ctx.beginPath();
     if (s.borderRadius > 0) {
       roundRect(ctx, wmX, wmY, wmW, wmH, s.borderRadius * scale);
@@ -161,41 +200,8 @@ async function compositeExport(): Promise<{ blob: Blob; filename: string }> {
     }
     ctx.clip();
 
-    ctx.globalAlpha = s.bgTextOpacity;
-    ctx.globalCompositeOperation = (s.bgTextBlendMode === 'normal' ? 'source-over' : s.bgTextBlendMode) as GlobalCompositeOperation;
-    // Include font weight (was missing — caused font metric mismatch with preview)
-    ctx.font = `${s.bgTextFontWeight} ${s.bgTextFontSize * scale}px ${s.bgTextFontFamily}`;
-    // Include letter spacing scaled up to match preview
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ('letterSpacing' in ctx) (ctx as any).letterSpacing = `${s.bgTextLetterSpacing * scale}px`;
-    ctx.fillStyle = s.bgTextColor;
-
-    let displayText = s.bgText;
-    if (s.bgTextTextTransform === 'uppercase') displayText = s.bgText.toUpperCase();
-    else if (s.bgTextTextTransform === 'lowercase') displayText = s.bgText.toLowerCase();
-    else if (s.bgTextTextTransform === 'capitalize') displayText = s.bgText.replace(/\b\w/g, (c) => c.toUpperCase());
-
-    if (s.bgTextRepeat) {
-      const tw = ctx.measureText(displayText).width + 30 * scale;
-      const th = s.bgTextFontSize * scale * 1.8;
-      // Anchor repeat pattern to CENTER of QR frame area (matches preview)
-      ctx.translate(wmX + wmW / 2, wmY + wmH / 2);
-      ctx.rotate((s.bgTextRotation * Math.PI) / 180);
-      for (let y = -wmH * 1.5; y < wmH * 1.5; y += th) {
-        for (let x = -wmW * 1.5; x < wmW * 1.5; x += tw) {
-          ctx.fillText(displayText, x, y);
-        }
-      }
-    } else {
-      // bgTextX/Y are percentages of the QR frame area — offset by wmX/wmY
-      const tx = wmX + (s.bgTextX / 100) * wmW;
-      const ty = wmY + (s.bgTextY / 100) * wmH;
-      ctx.translate(tx, ty);
-      ctx.rotate((s.bgTextRotation * Math.PI) / 180);
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(displayText, 0, 0);
-    }
+    // Draw the completed watermark layer directly on top
+    ctx.drawImage(wmCanvas, wmX, wmY);
     ctx.restore();
   }
 
