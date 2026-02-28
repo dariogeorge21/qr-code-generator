@@ -58,7 +58,7 @@ export default function LogoTab() {
         {!logoImage ? (
           <label
             htmlFor="logo-upload"
-            className="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all"
+            className="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-[var(--color-border)] rounded-2xl cursor-pointer hover:border-orange-600 dark:hover:border-yellow-400 hover:bg-orange-50 dark:hover:bg-yellow-400/5 transition-all"
           >
             <span className="text-4xl">🖼️</span>
             <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -68,7 +68,7 @@ export default function LogoTab() {
           </label>
         ) : (
           <div className="space-y-4">
-            <div className="relative flex items-center justify-center p-6 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+              <div className="relative flex items-center justify-center p-6 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
               <img
                 src={logoImage}
                 alt="Logo preview"
@@ -85,7 +85,7 @@ export default function LogoTab() {
             </div>
             <label
               htmlFor="logo-upload"
-              className="block text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold cursor-pointer"
+              className="block text-center text-sm text-orange-600 dark:text-yellow-400 hover:opacity-70 font-semibold cursor-pointer transition-opacity"
             >
               Change image
             </label>
@@ -94,7 +94,7 @@ export default function LogoTab() {
       </div>
 
       {logoImage && (
-        <div className="space-y-5 p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+        <div className="space-y-5 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
           {/* Size */}
           <div>
             <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-medium flex justify-between">
@@ -110,7 +110,7 @@ export default function LogoTab() {
               step="0.01"
               value={logoSize}
               onChange={(e) => set({ logoSize: Number(e.target.value) })}
-              className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
 
@@ -126,7 +126,7 @@ export default function LogoTab() {
               max="20"
               value={logoMargin}
               onChange={(e) => set({ logoMargin: Number(e.target.value) })}
-              className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
 
@@ -142,7 +142,7 @@ export default function LogoTab() {
               max="20"
               value={logoPadding}
               onChange={(e) => set({ logoPadding: Number(e.target.value) })}
-              className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
 
@@ -158,7 +158,7 @@ export default function LogoTab() {
               max="50"
               value={logoRadius}
               onChange={(e) => set({ logoRadius: Number(e.target.value) })}
-              className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
 

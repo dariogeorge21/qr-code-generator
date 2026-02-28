@@ -17,8 +17,8 @@ export default function StyleTab() {
   const btnClass = (active: boolean) =>
     `px-3 py-3 rounded-xl border-2 text-xs font-semibold transition-all duration-200 flex flex-col items-center gap-1.5 ${
       active
-        ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shadow-sm'
-        : 'border-gray-100 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
+        ? 'border-orange-600 dark:border-yellow-400 bg-orange-50 dark:bg-yellow-400/10 text-orange-600 dark:text-yellow-400 shadow-sm'
+        : 'border-[var(--color-border)] text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
     }`;
 
   return (
@@ -84,8 +84,8 @@ export default function StyleTab() {
           </h4>
           <button
             onClick={() => set({ useCustomEyeColors: !useCustomEyeColors })}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 ${
-              useCustomEyeColors ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
+            className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/20 ${
+              useCustomEyeColors ? 'bg-orange-600 dark:bg-yellow-400' : 'bg-gray-200 dark:bg-gray-700'
             }`}
           >
             <span
@@ -96,7 +96,7 @@ export default function StyleTab() {
           </button>
         </div>
         {useCustomEyeColors && (
-          <div className="space-y-4 p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+          <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
             <div>
               <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-medium">Eye Frame Color</label>
               <div className="flex items-center gap-2">
@@ -104,13 +104,13 @@ export default function StyleTab() {
                   type="color"
                   value={cornerSquareColor}
                   onChange={(e) => set({ cornerSquareColor: e.target.value })}
-                  className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                  className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
                 />
                 <input
                   type="text"
                   value={cornerSquareColor}
                   onChange={(e) => set({ cornerSquareColor: e.target.value })}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono focus:ring-4 focus:ring-blue-500/20 outline-none transition-all"
+                  className="flex-1 px-3 py-2 text-sm border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] text-[var(--color-text)] font-mono focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 outline-none transition-all"
                 />
               </div>
             </div>
@@ -121,13 +121,13 @@ export default function StyleTab() {
                   type="color"
                   value={cornerDotColor}
                   onChange={(e) => set({ cornerDotColor: e.target.value })}
-                  className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                  className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
                 />
                 <input
                   type="text"
                   value={cornerDotColor}
                   onChange={(e) => set({ cornerDotColor: e.target.value })}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono focus:ring-4 focus:ring-blue-500/20 outline-none transition-all"
+                  className="flex-1 px-3 py-2 text-sm border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] text-[var(--color-text)] font-mono focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 outline-none transition-all"
                 />
               </div>
             </div>
@@ -139,7 +139,7 @@ export default function StyleTab() {
       <div>
         <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex justify-between">
           <span>Preview Size</span>
-          <span className="text-blue-600 dark:text-blue-400 normal-case font-bold">{qrSize}px</span>
+          <span className="text-orange-600 dark:text-yellow-400 normal-case font-bold">{qrSize}px</span>
         </h4>
         <input
           type="range"
@@ -148,7 +148,7 @@ export default function StyleTab() {
           step="10"
           value={qrSize}
           onChange={(e) => set({ qrSize: Number(e.target.value) })}
-          className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+          className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
         />
         <div className="flex justify-between text-xs text-gray-400 mt-2 font-medium">
           <span>150px</span>

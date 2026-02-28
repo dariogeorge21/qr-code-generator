@@ -48,13 +48,13 @@ export default function ColorsTab() {
                 type="color"
                 value={fgColor}
                 onChange={(e) => set({ fgColor: e.target.value, activePalette: 'Custom' })}
-                className="w-10 h-10 rounded-xl border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                className="w-10 h-10 rounded-xl border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
               />
               <input
                 type="text"
                 value={fgColor}
                 onChange={(e) => set({ fgColor: e.target.value, activePalette: 'Custom' })}
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50/50 dark:bg-gray-700/50 text-gray-900 dark:text-white font-mono focus:ring-4 focus:ring-blue-500/20 outline-none transition-all"
+                className="flex-1 px-3 py-2 text-sm border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] text-[var(--color-text)] font-mono focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 outline-none transition-all"
               />
             </div>
           </div>
@@ -65,13 +65,13 @@ export default function ColorsTab() {
                 type="color"
                 value={bgColor}
                 onChange={(e) => set({ bgColor: e.target.value, activePalette: 'Custom' })}
-                className="w-10 h-10 rounded-xl border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                className="w-10 h-10 rounded-xl border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
               />
               <input
                 type="text"
                 value={bgColor}
                 onChange={(e) => set({ bgColor: e.target.value, activePalette: 'Custom' })}
-                className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50/50 dark:bg-gray-700/50 text-gray-900 dark:text-white font-mono focus:ring-4 focus:ring-blue-500/20 outline-none transition-all"
+                className="flex-1 px-3 py-2 text-sm border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] text-[var(--color-text)] font-mono focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 outline-none transition-all"
               />
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function ColorsTab() {
         <div className="flex gap-2 mt-4">
           <button
             onClick={randomColor}
-            className="px-4 py-2 text-xs font-bold bg-linear-to-r from-pink-500 to-violet-500 text-white rounded-xl hover:opacity-90 transition-all active:scale-95 shadow-sm"
+            className="px-4 py-2 text-xs font-bold bg-orange-600 dark:bg-yellow-400 text-white dark:text-black rounded-xl hover:opacity-90 transition-all active:scale-95 shadow-sm"
           >
             🎲 Random
           </button>
@@ -100,8 +100,8 @@ export default function ColorsTab() {
           </h4>
           <button
             onClick={() => set({ useFgGradient: !useFgGradient })}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 ${
-              useFgGradient ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
+            className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/20 ${
+              useFgGradient ? 'bg-orange-600 dark:bg-yellow-400' : 'bg-gray-200 dark:bg-gray-700'
             }`}
           >
             <span
@@ -112,7 +112,7 @@ export default function ColorsTab() {
           </button>
         </div>
         {useFgGradient && (
-          <div className="space-y-4 p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+          <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
             <div className="flex gap-2">
               {(['linear', 'radial'] as const).map((type) => (
                 <button
@@ -120,8 +120,8 @@ export default function ColorsTab() {
                   onClick={() => set({ fgGradient: { ...fgGradient, type } })}
                   className={`flex-1 px-3 py-2 text-sm rounded-xl border-2 font-semibold transition-all ${
                     fgGradient.type === type
-                      ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shadow-sm'
-                      : 'border-gray-100 dark:border-gray-700 text-gray-500 hover:border-gray-300 dark:hover:border-gray-500'
+                      ? 'border-orange-600 dark:border-yellow-400 bg-orange-50 dark:bg-yellow-400/10 text-orange-600 dark:text-yellow-400 shadow-sm'
+                      : 'border-[var(--color-border)] text-gray-500 hover:border-gray-300 dark:hover:border-gray-500'
                   }`}
                 >
                   {type === 'linear' ? '↗ Linear' : '◉ Radial'}
@@ -139,7 +139,7 @@ export default function ColorsTab() {
                 max="360"
                 value={fgGradient.rotation}
                 onChange={(e) => set({ fgGradient: { ...fgGradient, rotation: Number(e.target.value) } })}
-                className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -154,7 +154,7 @@ export default function ColorsTab() {
                       stops[0] = { ...stops[0], color: e.target.value };
                       set({ fgGradient: { ...fgGradient, colorStops: stops }, activePalette: 'Custom' });
                     }}
-                    className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                    className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
                   />
                   <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{fgGradient.colorStops[0].color}</span>
                 </div>
@@ -170,7 +170,7 @@ export default function ColorsTab() {
                       stops[1] = { ...stops[1], color: e.target.value };
                       set({ fgGradient: { ...fgGradient, colorStops: stops }, activePalette: 'Custom' });
                     }}
-                    className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                    className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
                   />
                   <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{fgGradient.colorStops[1].color}</span>
                 </div>
@@ -201,7 +201,7 @@ export default function ColorsTab() {
               const p = PALETTES[Math.floor(Math.random() * PALETTES.length)];
               set({ fgColor: p.fg, bgColor: p.bg, activePalette: p.name });
             }}
-            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-bold transition-colors"
+            className="text-xs text-orange-600 dark:text-yellow-400 hover:opacity-70 font-bold transition-opacity"
           >
             🔀 Random
           </button>
@@ -214,8 +214,8 @@ export default function ColorsTab() {
               title={p.name}
               className={`group relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-110 ${
                 activePalette === p.name
-                  ? 'border-blue-500 ring-4 ring-blue-500/20 scale-110 shadow-sm'
-                  : 'border-gray-100 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+                  ? 'border-orange-600 dark:border-yellow-400 ring-4 ring-orange-500/20 dark:ring-yellow-400/20 scale-110 shadow-sm'
+                  : 'border-[var(--color-border)] hover:border-gray-300 dark:hover:border-gray-500'
               }`}
             >
               <div className="absolute inset-0" style={{ backgroundColor: p.bg }} />

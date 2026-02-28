@@ -31,9 +31,9 @@ export default function TextTab() {
   const set = useQRStore((s) => s.set);
 
   const inputClass =
-    'w-full px-3 py-2.5 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50/50 dark:bg-gray-700/50 text-gray-900 dark:text-white transition-all focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 outline-none';
+    'w-full px-3 py-2.5 text-sm border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] text-[var(--color-text)] transition-all focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 outline-none';
   const selectClass =
-    'w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50/50 dark:bg-gray-700/50 text-gray-900 dark:text-white outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all';
+    'w-full px-3 py-2 text-sm border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] text-[var(--color-text)] outline-none focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 transition-all';
 
   const alignButtons = (current: TextAlign, prefix: 'title' | 'caption') => (
     <div className="flex gap-1.5">
@@ -43,7 +43,7 @@ export default function TextTab() {
           onClick={() => set({ [`${prefix}Align`]: a } as Record<string, TextAlign>)}
           className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
             current === a
-              ? 'bg-blue-500 text-white shadow-sm'
+              ? 'bg-orange-600 dark:bg-yellow-400 text-white dark:text-black shadow-sm'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
           }`}
         >
@@ -89,13 +89,13 @@ export default function TextTab() {
             )}
           </div>
           {bgText && (
-            <p className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-xl">
+            <p className="text-xs text-orange-600 dark:text-yellow-400 flex items-center gap-1.5 bg-orange-50 dark:bg-yellow-400/10 px-3 py-2 rounded-xl">
               <span>💡</span> Text renders behind the QR dots. Use low opacity for best scan results.
             </p>
           )}
 
           {bgText && (
-            <div className="space-y-4 p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+              <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-medium">Font</label>
@@ -122,7 +122,7 @@ export default function TextTab() {
                     max="120"
                     value={bgTextFontSize}
                     onChange={(e) => set({ bgTextFontSize: Number(e.target.value) })}
-                    className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                    className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                   />
                 </div>
               </div>
@@ -135,7 +135,7 @@ export default function TextTab() {
                       type="color"
                       value={bgTextColor}
                       onChange={(e) => set({ bgTextColor: e.target.value })}
-                      className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                      className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
                     />
                     <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{bgTextColor}</span>
                   </div>
@@ -152,7 +152,7 @@ export default function TextTab() {
                     step="0.01"
                     value={bgTextOpacity}
                     onChange={(e) => set({ bgTextOpacity: Number(e.target.value) })}
-                    className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                    className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                   />
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function TextTab() {
                     max="100"
                     value={bgTextX}
                     onChange={(e) => set({ bgTextX: Number(e.target.value) })}
-                    className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                    className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                   />
                 </div>
                 <div>
@@ -183,7 +183,7 @@ export default function TextTab() {
                     max="100"
                     value={bgTextY}
                     onChange={(e) => set({ bgTextY: Number(e.target.value) })}
-                    className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                    className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                   />
                 </div>
               </div>
@@ -199,7 +199,7 @@ export default function TextTab() {
                   max="180"
                   value={bgTextRotation}
                   onChange={(e) => set({ bgTextRotation: Number(e.target.value) })}
-                  className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
 
@@ -207,8 +207,8 @@ export default function TextTab() {
                 <label className="text-xs text-gray-500 dark:text-gray-400 font-medium">Repeat (Watermark)</label>
                 <button
                   onClick={() => set({ bgTextRepeat: !bgTextRepeat })}
-                  className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 ${
-                    bgTextRepeat ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
+                  className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/20 ${
+                    bgTextRepeat ? 'bg-orange-600 dark:bg-yellow-400' : 'bg-gray-200 dark:bg-gray-700'
                   }`}
                 >
                   <span
@@ -237,7 +237,7 @@ export default function TextTab() {
           className={inputClass}
         />
         {title && (
-          <div className="mt-4 space-y-4 p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+          <div className="mt-4 space-y-4 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-medium">Font</label>
@@ -280,7 +280,7 @@ export default function TextTab() {
                   max="48"
                   value={titleFontSize}
                   onChange={(e) => set({ titleFontSize: Number(e.target.value) })}
-                  className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
               <div>
@@ -294,7 +294,7 @@ export default function TextTab() {
                   max="40"
                   value={titleSpacing}
                   onChange={(e) => set({ titleSpacing: Number(e.target.value) })}
-                  className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
             </div>
@@ -304,7 +304,7 @@ export default function TextTab() {
                   type="color"
                   value={titleColor}
                   onChange={(e) => set({ titleColor: e.target.value })}
-                  className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                  className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
                 />
                 <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{titleColor}</span>
               </div>
@@ -328,7 +328,7 @@ export default function TextTab() {
           className={inputClass}
         />
         {caption && (
-          <div className="mt-4 space-y-4 p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+          <div className="mt-4 space-y-4 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-medium">Font</label>
@@ -371,7 +371,7 @@ export default function TextTab() {
                   max="36"
                   value={captionFontSize}
                   onChange={(e) => set({ captionFontSize: Number(e.target.value) })}
-                  className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
               <div>
@@ -385,7 +385,7 @@ export default function TextTab() {
                   max="40"
                   value={captionSpacing}
                   onChange={(e) => set({ captionSpacing: Number(e.target.value) })}
-                  className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                  className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
             </div>
@@ -395,7 +395,7 @@ export default function TextTab() {
                   type="color"
                   value={captionColor}
                   onChange={(e) => set({ captionColor: e.target.value })}
-                  className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+                  className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
                 />
                 <span className="text-xs font-mono text-gray-500 dark:text-gray-400">{captionColor}</span>
               </div>

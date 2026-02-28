@@ -33,8 +33,8 @@ export default function FrameTab() {
         </h4>
         <button
           onClick={() => set({ frameEnabled: !frameEnabled })}
-          className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500/20 ${
-            frameEnabled ? 'bg-blue-500' : 'bg-gray-200 dark:bg-gray-700'
+          className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/20 ${
+            frameEnabled ? 'bg-orange-600 dark:bg-yellow-400' : 'bg-gray-200 dark:bg-gray-700'
           }`}
         >
           <span
@@ -46,7 +46,7 @@ export default function FrameTab() {
       </div>
 
       {frameEnabled && (
-        <div className="space-y-5 p-4 bg-gray-50/50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700/50">
+        <div className="space-y-5 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
           {/* Border Type */}
           <div>
             <label className="text-xs text-gray-500 dark:text-gray-400 mb-2 block font-medium">Border Type</label>
@@ -57,8 +57,8 @@ export default function FrameTab() {
                   onClick={() => set({ borderType: bt.key })}
                   className={`px-2 py-2.5 rounded-xl border-2 text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
                     borderType === bt.key
-                      ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shadow-sm'
-                      : 'border-gray-100 dark:border-gray-700 text-gray-500 hover:border-gray-300 dark:hover:border-gray-500'
+                      ? 'border-orange-600 dark:border-yellow-400 bg-orange-50 dark:bg-yellow-400/10 text-orange-600 dark:text-yellow-400 shadow-sm'
+                      : 'border-[var(--color-border)] text-gray-500 hover:border-gray-300 dark:hover:border-gray-500'
                   }`}
                 >
                   <span className="text-sm leading-none">{bt.preview}</span>
@@ -81,7 +81,7 @@ export default function FrameTab() {
               step="1"
               value={borderWidth}
               onChange={(e) => set({ borderWidth: Number(e.target.value) })}
-              className="w-full accent-blue-500 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+              className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
 
@@ -93,13 +93,13 @@ export default function FrameTab() {
             type="color"
             value={borderColor.substring(0, 7)}
             onChange={(e) => set({ borderColor: e.target.value })}
-            className="w-10 h-10 rounded-xl border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent p-0.5"
+          className="w-10 h-10 rounded-xl border-2 border-[var(--color-border)] cursor-pointer bg-transparent p-0.5"
           />
           <input
             type="text"
             value={borderColor}
             onChange={(e) => set({ borderColor: e.target.value })}
-            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono focus:ring-4 focus:ring-blue-500/20 outline-none transition-all"
+          className="flex-1 px-3 py-2 text-sm border border-[var(--color-border)] rounded-xl bg-[var(--color-background)] text-[var(--color-text)] font-mono focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 outline-none transition-all"
           />
         </div>
       </div>
@@ -117,7 +117,7 @@ export default function FrameTab() {
               step="1"
               value={borderRadius}
               onChange={(e) => set({ borderRadius: Number(e.target.value) })}
-              className="w-full accent-blue-500"
+              className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
             />
           </div>
         </div>
@@ -127,7 +127,7 @@ export default function FrameTab() {
       <div>
         <h4 className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">
           Inner Padding:{' '}
-          <span className="text-blue-600 dark:text-blue-400 normal-case">{padding}px</span>
+          <span className="text-orange-600 dark:text-yellow-400 normal-case">{padding}px</span>
         </h4>
         <input
           type="range"
@@ -136,7 +136,7 @@ export default function FrameTab() {
           step="2"
           value={padding}
           onChange={(e) => set({ padding: Number(e.target.value) })}
-          className="w-full accent-blue-500"
+          className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
         />
       </div>
 
@@ -148,20 +148,20 @@ export default function FrameTab() {
           </h4>
           <button
             onClick={() => set({ shadowEnabled: !shadowEnabled })}
-            className={`relative w-9 h-5 rounded-full transition-colors duration-200 ${
-              shadowEnabled ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+            className={`relative w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/20 ${
+              shadowEnabled ? 'bg-orange-600 dark:bg-yellow-400' : 'bg-gray-200 dark:bg-gray-700'
             }`}
           >
             <span
-              className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
-                shadowEnabled ? 'translate-x-4' : ''
+              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${
+                shadowEnabled ? 'translate-x-6' : 'translate-x-0'
               }`}
             />
           </button>
         </div>
 
         {shadowEnabled && (
-          <div className="space-y-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+          <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-[var(--color-border)]">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">
@@ -173,7 +173,7 @@ export default function FrameTab() {
                   max="20"
                   value={shadowX}
                   onChange={(e) => set({ shadowX: Number(e.target.value) })}
-                  className="w-full accent-blue-500"
+                  className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
               <div>
@@ -186,7 +186,7 @@ export default function FrameTab() {
                   max="20"
                   value={shadowY}
                   onChange={(e) => set({ shadowY: Number(e.target.value) })}
-                  className="w-full accent-blue-500"
+                  className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
                 />
               </div>
             </div>
@@ -200,7 +200,7 @@ export default function FrameTab() {
                 max="60"
                 value={shadowBlur}
                 onChange={(e) => set({ shadowBlur: Number(e.target.value) })}
-                className="w-full accent-blue-500"
+              className="w-full accent-orange-600 dark:accent-yellow-400 h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
               />
             </div>
             <div>
@@ -210,13 +210,13 @@ export default function FrameTab() {
                   type="color"
                   value={shadowColor.substring(0, 7)}
                   onChange={(e) => set({ shadowColor: e.target.value })}
-                  className="w-8 h-8 rounded-lg border-2 border-gray-200 dark:border-gray-600 cursor-pointer bg-transparent"
+                  className="w-8 h-8 rounded-lg border-2 border-[var(--color-border)] cursor-pointer bg-transparent"
                 />
                 <input
                   type="text"
                   value={shadowColor}
                   onChange={(e) => set({ shadowColor: e.target.value })}
-                  className="flex-1 px-2 py-1.5 text-xs border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono"
+                  className="flex-1 px-2 py-1.5 text-xs border border-[var(--color-border)] rounded-lg bg-[var(--color-background)] text-[var(--color-text)] font-mono focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 dark:focus:border-yellow-400 outline-none transition-all"
                 />
               </div>
             </div>
