@@ -19,10 +19,11 @@ export default function Footer() {
           {/* Centre */}
           <div>
             <h4 className="text-sm font-bold text-[var(--color-text)] mb-3 uppercase tracking-wider">
-              Features
+              Pages
             </h4>
             <ul className="space-y-2">
               {[
+                { label: 'Home', href: '/' },
                 { label: 'URL QR Code', href: '/create/website' },
                 { label: 'WiFi QR Code', href: '/create/wifi' },
                 { label: 'Payment QR Code', href: '/create/payment' },
@@ -43,12 +44,12 @@ export default function Footer() {
           {/* Right */}
           <div>
             <h4 className="text-sm font-bold text-[var(--color-text)] mb-3 uppercase tracking-wider">
-              Company
+              Community
             </h4>
             <ul className="space-y-2">
               {[
-                { label: 'About', href: '/about' },
                 { label: 'Contact', href: '/contact' },
+                { label: 'About', href: '/about' },
                 { label: 'Support This Project', href: '/support' },
               ].map((link) => (
                 <li key={link.label}>
@@ -67,7 +68,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-10 pt-6 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            © 2026 QR Code Studio. Built with love by Dario.
+            © 2026 QR Code Studio. Built with love by Dario George
           </p>
           <div className="flex items-center gap-4">
             <a
@@ -89,7 +90,9 @@ export default function Footer() {
               <Linkedin className="w-5 h-5" />
             </a>
             <a
-              href="https://github.com/dariogeorge21/qr-code-studio/issues/new"
+              rel="noopener noreferrer"
+              target="_blank"
+              href="https://github.com/dariogeorge21/qr-code-studio/issues/new?assignees=&labels=bug&template=bug_report.md&title="
               className="text-xs text-gray-400 hover:text-[var(--color-secondary)] transition-colors"
             >
               Report an Issue
