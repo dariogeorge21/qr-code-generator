@@ -47,11 +47,9 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               {[
-                { label: 'About', href: '#' },
-                { label: 'Contact', href: '#' },
-                { label: 'Privacy Policy', href: '#' },
-                { label: 'Terms', href: '#' },
-                { label: 'Support This Project', href: '#' },
+                { label: 'About', href: '/about' },
+                { label: 'Contact', href: '/contact' },
+                { label: 'Support This Project', href: '/support' },
               ].map((link) => (
                 <li key={link.label}>
                   <Link
@@ -73,7 +71,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com"
+              href="https://github.com/dariogeorge21"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-[var(--color-secondary)] transition-colors"
@@ -82,7 +80,7 @@ export default function Footer() {
               <Github className="w-5 h-5" />
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://linkedin.com/in/dariogeorge21"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-[var(--color-secondary)] transition-colors"
@@ -91,7 +89,7 @@ export default function Footer() {
               <Linkedin className="w-5 h-5" />
             </a>
             <a
-              href="#"
+              href="https://github.com/dariogeorge21/qr-code-studio/issues/new"
               className="text-xs text-gray-400 hover:text-[var(--color-secondary)] transition-colors"
             >
               Report an Issue
