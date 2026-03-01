@@ -39,6 +39,14 @@ export default function CreatePage() {
     } else {
       set({ mode: 'general' });
     }
+    
+    // Increment generated counter
+    fetch('/api/qr-counter/increment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'generated' }),
+    }).catch((err) => console.error('Failed to increment counter:', err));
+    
     router.push(`/create/${type}`);
   };
 

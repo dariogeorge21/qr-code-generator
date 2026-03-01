@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQRStore } from '../store/useQRStore';
 import type { ExportFormat } from '../types/qr';
+import { incrementQRDownloaded } from '@/lib/supabase';
 
 // Helper to draw a rounded rectangle on canvas
 function roundRect(
@@ -346,6 +347,13 @@ export default function ExportToolbar() {
       const result =
         exportFormat === 'svg' ? await svgExport() : await compositeExport();
       downloadBlob(result.blob, result.filename);
+      
+      // Increment download counter
+      try {
+        await incrementQRDownloaded();
+      } catch (err) {
+        console.error('Failed to increment download counter:', err);
+      }
     } catch (err) {
       console.error('Export failed:', err);
       setError('Export failed. Please try again.');
