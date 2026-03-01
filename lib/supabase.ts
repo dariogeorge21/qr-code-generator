@@ -78,3 +78,36 @@ export async function incrementQRDownloaded() {
     return { success: false, error };
   }
 }
+
+// ── Detailed event analytics (privacy-safe: no QR content stored) ──────────
+
+export interface QREvent {
+  event_type: 'generated' | 'downloaded';
+  qr_type?: string;       // 'website' | 'payment' | 'wifi' | 'text' | etc.
+  export_format?: string; // 'png' | 'svg' | 'jpeg' | 'webp'
+  color_modified?: boolean;
+  style_modified?: boolean;
+  frame_modified?: boolean;
+  logo_added?: boolean;
+  text_added?: boolean;
+}
+
+export async function logQREvent(event: QREvent) {
+  try {
+    const { error } = await supabase.from('qr_events').insert([{
+      event_type: event.event_type,
+      qr_type: event.qr_type ?? null,
+      export_format: event.export_format ?? null,
+      color_modified: event.color_modified ?? false,
+      style_modified: event.style_modified ?? false,
+      frame_modified: event.frame_modified ?? false,
+      logo_added: event.logo_added ?? false,
+      text_added: event.text_added ?? false,
+    }]);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Error logging QR event:', error);
+    return { success: false, error };
+  }
+}

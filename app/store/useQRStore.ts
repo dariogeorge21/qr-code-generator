@@ -17,6 +17,7 @@ import type {
 export interface QRState {
   // ── Input ──
   mode: 'general' | 'upi';
+  qrType: string; // e.g. 'website' | 'payment' | 'wifi' | 'text' | etc.
   inputValue: string;
   upiId: string;
   payeeName: string;
@@ -148,6 +149,7 @@ export type QRStore = QRState & QRActions;
 
 const initialState: QRState = {
   mode: 'general',
+  qrType: '',
   inputValue: '',
   upiId: '',
   payeeName: '',
