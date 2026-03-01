@@ -11,6 +11,30 @@ interface QRCounterData {
   total_downloaded: number;
 }
 
+const AnimatedCounter = ({ value }: { value: number }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const end = value;
+    if (start === end) return;
+
+    // Adjust duration (1000ms = 1 second)
+    const duration = 1000;
+    const incrementTime = Math.abs(Math.floor(duration / end));
+
+    const timer = setInterval(() => {
+      start += 1;
+      setCount(start);
+      if (start === end) clearInterval(timer);
+    }, incrementTime);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  return <span>{count.toLocaleString()}</span>;
+};
+
 export default function LandingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -35,6 +59,7 @@ export default function LandingPage() {
     fetchCounter();
   }, []);
 
+
   const handleGetStarted = () => {
     setLoading(true);
     setTimeout(() => {
@@ -42,30 +67,7 @@ export default function LandingPage() {
     }, 600);
   };
 
-    const AnimatedCounter = ({ value }: { value: number }) => {
-    const [count, setCount] = useState(0);
-
-    useEffect(() => {
-      let start = 0;
-      const end = value;
-      if (start === end) return;
-
-      // Adjust duration (2000ms = 2 seconds)
-      const duration = 2000;
-      const incrementTime = Math.abs(Math.floor(duration / end));
-
-      const timer = setInterval(() => {
-        start += 1;
-        setCount(start);
-        if (start === end) clearInterval(timer);
-      }, incrementTime);
-
-      return () => clearInterval(timer);
-    }, [value]);
-
-    return <span>{count.toLocaleString()}</span>;
-  };
-
+    
   return (
     <div className="min-h-screen flex flex-col">
       {/* Theme toggle */}
@@ -84,42 +86,40 @@ export default function LandingPage() {
           </p>
           
           {/* QR Counter Stats */}
-          {/* QR Counter Stats */}
-{!counterLoading && counter && (
-  <div className="mb-12 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full px-4 sm:px-0">
-    
-    {/* Stat Card 1: Generated */}
-    <div className="w-full sm:w-1/2 flex items-center gap-5 p-5 sm:p-6 rounded-3xl bg-[var(--color-background)] border border-[var(--color-border)] shadow-sm hover:shadow-md transition-all duration-300 group">
-      <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-        <TrendingUp className="w-7 h-7 text-orange-600 dark:text-orange-400" />
-      </div>
-      <div className="flex flex-col text-left">
-        <span className="text-3xl font-black text-[var(--color-text)] tracking-tight leading-none mb-1">
-          <AnimatedCounter value={counter.total_generated} />
-        </span>
-        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-          QR Codes Generated
-        </span>
-      </div>
-    </div>
+          {!counterLoading && counter && (
+            <div className="mb-12 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full px-4 sm:px-0">
+              
+              {/* Stat Card 1: Generated */}
+              <div className="w-full sm:w-1/2 flex items-center gap-5 p-5 sm:p-6 rounded-3xl bg-[var(--color-background)] border border-[var(--color-border)] shadow-sm hover:shadow-md transition-all duration-300 group">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <TrendingUp className="w-7 h-7 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-3xl font-black text-[var(--color-text)] tracking-tight leading-none mb-1">
+                    <AnimatedCounter value={counter.total_generated} />
+                  </span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    QR Codes Generated
+                  </span>
+                </div>
+              </div>
 
-    {/* Stat Card 2: Downloaded */}
-    <div className="w-full sm:w-1/2 flex items-center gap-5 p-5 sm:p-6 rounded-3xl bg-[var(--color-background)] border border-[var(--color-border)] shadow-sm hover:shadow-md transition-all duration-300 group">
-      <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-        <Download className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-      </div>
-      <div className="flex flex-col text-left">
-        <span className="text-3xl font-black text-[var(--color-text)] tracking-tight leading-none mb-1">
-          <AnimatedCounter value={counter.total_downloaded} />
-        </span>
-        <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-          Total Downloads
-        </span>
-      </div>
-    </div>
-
-  </div>
-)}
+              {/* Stat Card 2: Downloaded */}
+              <div className="w-full sm:w-1/2 flex items-center gap-5 p-5 sm:p-6 rounded-3xl bg-[var(--color-background)] border border-[var(--color-border)] shadow-sm hover:shadow-md transition-all duration-300 group">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Download className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div className="flex flex-col text-left">
+                  <span className="text-3xl font-black text-[var(--color-text)] tracking-tight leading-none mb-1">
+                    <AnimatedCounter value={counter.total_downloaded} />
+                  </span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+                    Total Downloads
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
           
           <button
             onClick={handleGetStarted}
