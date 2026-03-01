@@ -304,6 +304,7 @@ export default function ExportPage({ params }: { params: Promise<{ type: string 
       fetch('/api/qr-events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
         body: JSON.stringify({
           event_type: 'downloaded',
           qr_type: type,
@@ -322,7 +323,11 @@ export default function ExportPage({ params }: { params: Promise<{ type: string 
           logo_added: s.logoImage !== null,
           text_added: !!(s.title?.trim() || s.caption?.trim() || s.bgText?.trim()),
         }),
-      }).catch((err) => console.error('Failed to log download event:', err));
+      })
+        .then((res) => {
+          if (!res.ok) res.json().then((d) => console.error('[qr-events] downloaded error:', d));
+        })
+        .catch((err) => console.error('[qr-events] network error (downloaded):', err));
 
       setTimeout(() => router.push('/thank-you'), 500);
     } catch (err) {

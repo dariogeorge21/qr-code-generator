@@ -352,6 +352,7 @@ export default function ExportToolbar() {
       fetch('/api/qr-events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
         body: JSON.stringify({
           event_type: 'downloaded',
           qr_type: s.qrType || 'unknown',
@@ -370,7 +371,11 @@ export default function ExportToolbar() {
           logo_added: s.logoImage !== null,
           text_added: !!(s.title?.trim() || s.caption?.trim() || s.bgText?.trim()),
         }),
-      }).catch((err) => console.error('Failed to log download event:', err));
+      })
+        .then((res) => {
+          if (!res.ok) res.json().then((d) => console.error('[qr-events] downloaded error:', d));
+        })
+        .catch((err) => console.error('[qr-events] network error (downloaded):', err));
     } catch (err) {
       console.error('Export failed:', err);
       setError('Export failed. Please try again.');

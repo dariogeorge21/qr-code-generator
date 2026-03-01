@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-server';
 import AdminLogout from './AdminLogout';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -98,13 +98,13 @@ export default async function AdminPage() {
 
   // ── Fetch data ─────────────────────────────────────────────────────────────
   const [{ data: counterRaw }, { data: eventsRaw }, { data: contactsRaw }] = await Promise.all([
-    supabase.from('qr_counter').select('total_generated, total_downloaded').single(),
-    supabase
+    supabaseAdmin.from('qr_counter').select('total_generated, total_downloaded').single(),
+    supabaseAdmin
       .from('qr_events')
       .select('id, event_type, qr_type, export_format, color_modified, style_modified, frame_modified, logo_added, text_added, created_at')
       .order('created_at', { ascending: false })
       .limit(5000),
-    supabase
+    supabaseAdmin
       .from('contacts')
       .select('id, name, email, subject, message, created_at')
       .order('created_at', { ascending: false })

@@ -40,12 +40,17 @@ export default function CreatePage() {
       set({ mode: 'general', qrType: type });
     }
 
-    // Log a 'generated' event with the chosen QR type (fire-and-forget)
+    // Log a 'generated' event with the chosen QR type (fire-and-forget, keepalive so navigation can't cancel it)
     fetch('/api/qr-events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ event_type: 'generated', qr_type: type }),
-    }).catch((err) => console.error('Failed to log QR event:', err));
+      keepalive: true,
+    })
+      .then((res) => {
+        if (!res.ok) res.json().then((d) => console.error('[qr-events] generated error:', d));
+      })
+      .catch((err) => console.error('[qr-events] network error (generated):', err));
 
     router.push(`/create/${type}`);
   };
