@@ -35,6 +35,8 @@ export default function InputFormByType({ type }: InputFormByTypeProps) {
   const [smsPhone, setSmsPhone] = useState('');
   const [smsMessage, setSmsMessage] = useState('');
 
+  const [phoneNumber, setPhoneNumber] = useState('');
+
   const [socialPlatform, setSocialPlatform] = useState('');
   const [socialUrl, setSocialUrl] = useState('');
 
@@ -274,7 +276,16 @@ export default function InputFormByType({ type }: InputFormByTypeProps) {
       return (
         <div>
           <label className={labelClass}>Phone Number</label>
-          <input type="tel" value={inputValue} onChange={(e) => set({ inputValue: `tel:${e.target.value}` })} placeholder="+1 234 567 8900" className={inputClass} />
+          <input
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => {
+              setPhoneNumber(e.target.value);
+              set({ inputValue: `tel:${e.target.value}` });
+            }}
+            placeholder="+1 234 567 8900"
+            className={inputClass}
+          />
         </div>
       );
 
