@@ -99,7 +99,6 @@ export default function StyleTab() {
       cornerSquareColor: sq,
       cornerDotColor: dt,
       errorCorrectionLevel: pick(['L', 'M', 'Q', 'H'] as const) as ErrorCorrectionLevel,
-      qrSize: pick([180, 220, 280, 320, 400, 512]),
     });
   }, [set]);
 
