@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     title: "Free QR Code Generator – QR Code Studio",
     description: "Create custom QR codes for free. Supports WiFi, UPI, URLs, contacts, and more.",
     images: ["/og-banner.png"],
-    url: "https://yourdomain.com",
+    url: "https://qr.dariogeorge.in",
   },
   twitter: {
     card: "summary_large_image",

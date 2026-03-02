@@ -7,7 +7,7 @@ import { CheckCircle, MessageCircle, Twitter, Link2, Mail, QrCode, BanknoteX, Lo
 export default function ThankYouPage() {
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
-  const appUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yourdomain.com';
+  const appUrl = typeof window !== 'undefined' ? window.location.origin : 'https://qr.dariogeorge.in';
   const shareMessage = `I just created a free QR code using QR Code Studio. Try it here: ${appUrl}`;
 
   const shareLinks = [
