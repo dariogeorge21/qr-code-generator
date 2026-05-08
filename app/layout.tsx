@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Dosis } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./components/shared/ThemeProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 const dosis = Dosis({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
