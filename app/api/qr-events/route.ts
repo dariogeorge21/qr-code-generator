@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import { sharedDB } from '@/lib/sharedDB';
 
 /**
  * POST /api/qr-events
@@ -41,75 +41,44 @@ export async function POST(request: NextRequest) {
     let rpcOk = false;
     let insertOk = false;
 
-    // ── 1. Increment qr_counter via RPC (runs first — critical counter) ──────
-    const rpcName =
-      event_type === 'generated' ? 'increment_qr_generated' : 'increment_qr_downloaded';
-
-    const { error: rpcError } = await supabaseAdmin.rpc(rpcName);
-
-    if (rpcError) {
-      console.error(`[qr-events] RPC ${rpcName} failed:`, rpcError.message, '| code:', rpcError.code);
-
-      // Fallback: read current value then increment (handles missing row too)
-      const col = event_type === 'generated' ? 'total_generated' : 'total_downloaded';
-
-      const { data: counterRow } = await supabaseAdmin
-        .from('qr_counter')
-        .select(col)
-        .eq('id', 1)
-        .maybeSingle();
-
-      if (counterRow) {
-        // Row exists — bump the counter
-        const current = (counterRow as Record<string, number>)[col] ?? 0;
-        const { error: fallbackError } = await supabaseAdmin
-          .from('qr_counter')
-          .update({ [col]: current + 1, updated_at: new Date().toISOString() })
-          .eq('id', 1);
-
-        if (fallbackError) {
-          console.error('[qr-events] Fallback UPDATE failed:', fallbackError.message);
-        } else {
-          rpcOk = true;
-          console.log(`[qr-events] Fallback UPDATE succeeded for ${col} → ${current + 1}`);
-        }
-      } else {
-        // Row missing — create it
-        const { error: insertCounterError } = await supabaseAdmin
-          .from('qr_counter')
-          .insert([{
-            total_generated: event_type === 'generated' ? 1 : 0,
-            total_downloaded: event_type === 'downloaded' ? 1 : 0,
-          }]);
-
-        if (insertCounterError) {
-          console.error('[qr-events] Counter row INSERT failed:', insertCounterError.message);
-        } else {
-          rpcOk = true;
-          console.log('[qr-events] Created new qr_counter row');
-        }
+    await sharedDB.tx(async (client) => {
+      // ── 1. Increment qr_counter via SQL function (runs first — critical counter) ─
+      await client.query('SAVEPOINT sp_counter');
+      try {
+        const fn = event_type === 'generated' ? 'increment_qr_generated' : 'increment_qr_downloaded';
+        await client.query(`SELECT * FROM ${fn}()`);
+        rpcOk = true;
+      } catch (err) {
+        console.error('[qr-events] Counter increment failed:', err);
+        await client.query('ROLLBACK TO SAVEPOINT sp_counter');
       }
-    } else {
-      rpcOk = true;
-    }
 
-    // ── 2. Insert detailed event row (non-fatal if qr_events not migrated) ───
-    const { error: insertError } = await supabaseAdmin.from('qr_events').insert([{
-      event_type,
-      qr_type: qr_type ?? null,
-      export_format: export_format ?? null,
-      color_modified: Boolean(color_modified),
-      style_modified: Boolean(style_modified),
-      frame_modified: Boolean(frame_modified),
-      logo_added: Boolean(logo_added),
-      text_added: Boolean(text_added),
-    }]);
-
-    if (insertError) {
-      console.error('[qr-events] qr_events insert failed:', insertError.message, '| code:', insertError.code);
-    } else {
-      insertOk = true;
-    }
+      // ── 2. Insert detailed event row (non-fatal if qr_events not migrated) ──
+      await client.query('SAVEPOINT sp_event');
+      try {
+        await client.query(
+          `INSERT INTO qr_events (
+             event_type, qr_type, export_format,
+             color_modified, style_modified, frame_modified,
+             logo_added, text_added
+           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+          [
+            event_type,
+            (qr_type ?? null) as string | null,
+            (export_format ?? null) as string | null,
+            Boolean(color_modified),
+            Boolean(style_modified),
+            Boolean(frame_modified),
+            Boolean(logo_added),
+            Boolean(text_added),
+          ],
+        );
+        insertOk = true;
+      } catch (err) {
+        console.error('[qr-events] qr_events insert failed:', err);
+        await client.query('ROLLBACK TO SAVEPOINT sp_event');
+      }
+    });
 
     if (!rpcOk && !insertOk) {
       return NextResponse.json({ error: 'All operations failed' }, { status: 500 });

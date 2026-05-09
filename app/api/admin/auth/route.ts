@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-server';
+import bcrypt from 'bcrypt';
 
 /**
  * POST /api/admin/auth
- * Reads the admin_passkey from qr_counter (id = 1) and compares it
- * with the submitted password. Sets a session cookie on success.
+ * Compares submitted password with env-provided bcrypt hash.
+ * Sets a session cookie on success.
  *
  * DELETE /api/admin/auth
  * Clears the admin session cookie (logout).
@@ -18,28 +18,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Password is required.' }, { status: 400 });
     }
 
-    // Read the passkey stored in the qr_counter row (service-role bypasses RLS)
-    const { data, error } = await supabaseAdmin
-      .from('qr_counter')
-      .select('admin_passkey')
-      .eq('id', 1)
-      .single();
-
-    if (error || !data) {
+    const hash = process.env.ADMIN_MASTER_PASSWORD_HASH;
+    if (!hash) {
       return NextResponse.json(
-        { error: 'Could not read admin passkey from database.' },
+        { error: 'Admin password not configured. Set ADMIN_MASTER_PASSWORD_HASH.' },
         { status: 500 },
       );
     }
 
-    if (!data.admin_passkey) {
-      return NextResponse.json(
-        { error: 'Admin passkey not set. Edit row 1 in the qr_counter table and set admin_passkey.' },
-        { status: 500 },
-      );
-    }
-
-    if (password !== data.admin_passkey) {
+    const ok = await bcrypt.compare(String(password), hash);
+    if (!ok) {
       return NextResponse.json({ error: 'Invalid password.' }, { status: 401 });
     }
 

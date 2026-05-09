@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { sharedDB } from '@/lib/sharedDB';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,38 +13,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update the counter based on type
-    const updatePayload = 
-      type === 'generated' 
-        ? { total_generated: supabase.rpc('increment_generated') }
-        : { total_downloaded: supabase.rpc('increment_downloaded') };
+    const functionName = type === 'generated' ? 'increment_qr_generated' : 'increment_qr_downloaded';
 
-    // Simple update approach - increment by 1
-    const columnToUpdate = type === 'generated' ? 'total_generated' : 'total_downloaded';
-
-    // Get current value
-    const { data: currentData, error: fetchError } = await supabase
-      .from('qr_counter')
-      .select(columnToUpdate)
-      .single();
-
-    if (fetchError) throw fetchError;
-
-    // Increment and update
-    const newValue = (currentData as Record<string, number>)[columnToUpdate] + 1;
-    
-    const { data, error } = await supabase
-      .from('qr_counter')
-      .update({ [columnToUpdate]: newValue, updated_at: new Date() })
-      .eq('id', 1)
-      .select();
-
-    if (error) throw error;
-
-    return NextResponse.json(
-      { success: true, data: data[0] },
-      { status: 200 }
+    const result = await sharedDB.query(
+      `SELECT total_generated, total_downloaded, updated_at::text as updated_at FROM ${functionName}()`,
     );
+
+    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 200 });
   } catch (error) {
     console.error('Error incrementing counter:', error);
     return NextResponse.json(

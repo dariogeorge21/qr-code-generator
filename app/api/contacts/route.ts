@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { sharedDB } from '@/lib/sharedDB';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,24 +14,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data, error } = await supabase
-      .from('contacts')
-      .insert([
-        {
-          name,
-          email,
-          subject: subject || null,
-          message,
-        },
-      ])
-      .select();
-
-    if (error) throw error;
-
-    return NextResponse.json(
-      { success: true, data: data[0] },
-      { status: 201 }
+    const result = await sharedDB.query(
+      `INSERT INTO contacts (name, email, subject, message)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, name, email, subject, message, created_at::text as created_at`,
+      [name, email, subject || null, message],
     );
+
+    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 201 });
   } catch (error) {
     console.error('Error submitting contact form:', error);
     return NextResponse.json(
