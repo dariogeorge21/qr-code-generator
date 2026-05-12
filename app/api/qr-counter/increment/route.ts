@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sharedDB } from '@/lib/sharedDB';
 
+function toSafeNumber(value: unknown): number {
+  const n = typeof value === 'bigint' ? Number(value) : Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -19,7 +24,19 @@ export async function POST(request: NextRequest) {
       `SELECT total_generated, total_downloaded, updated_at::text as updated_at FROM ${functionName}()`,
     );
 
-    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 200 });
+    const raw = result.rows[0] as
+      | { total_generated?: unknown; total_downloaded?: unknown; updated_at?: unknown }
+      | undefined;
+
+    const data = raw
+      ? {
+          ...raw,
+          total_generated: toSafeNumber(raw.total_generated ?? 0),
+          total_downloaded: toSafeNumber(raw.total_downloaded ?? 0),
+        }
+      : null;
+
+    return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (error) {
     console.error('Error incrementing counter:', error);
     return NextResponse.json(
