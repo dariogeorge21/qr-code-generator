@@ -60,7 +60,7 @@ async function compositeExport(): Promise<{ blob: Blob; filename: string }> {
   const qr = new QRCodeStyling({
     width: qrPx,
     height: qrPx,
-    data: s.inputValue || 'https://example.com',
+    data: s.inputValue || 'https://qr.dariogeorge.in',
     margin: 0,
     type: 'canvas',
     qrOptions: { errorCorrectionLevel: s.errorCorrectionLevel },
@@ -106,34 +106,6 @@ async function compositeExport(): Promise<{ blob: Blob; filename: string }> {
     } else {
       ctx.fillRect(0, 0, totalW, totalH);
     }
-  }
-
-  // Background text
-  if (s.bgText) {
-    ctx.save();
-    ctx.globalAlpha = s.bgTextOpacity;
-    ctx.font = `${s.bgTextFontSize * scale}px ${s.bgTextFontFamily}`;
-    ctx.fillStyle = s.bgTextColor;
-    if (s.bgTextRepeat) {
-      const tw = ctx.measureText(s.bgText).width + 30 * scale;
-      const th = s.bgTextFontSize * scale * 1.8;
-      ctx.translate(totalW / 2, totalH / 2);
-      ctx.rotate((s.bgTextRotation * Math.PI) / 180);
-      for (let y = -totalH * 1.5; y < totalH * 1.5; y += th) {
-        for (let x = -totalW * 1.5; x < totalW * 1.5; x += tw) {
-          ctx.fillText(s.bgText, x, y);
-        }
-      }
-    } else {
-      const tx = (s.bgTextX / 100) * totalW;
-      const ty = (s.bgTextY / 100) * totalH;
-      ctx.translate(tx, ty);
-      ctx.rotate((s.bgTextRotation * Math.PI) / 180);
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(s.bgText, 0, 0);
-    }
-    ctx.restore();
   }
 
   // Title
@@ -186,6 +158,66 @@ async function compositeExport(): Promise<{ blob: Blob; filename: string }> {
     ctx.restore();
   }
 
+  // Background text / watermark
+  // Draw this LAST so it stays above the QR in the final export.
+  // We render it on an off-screen canvas to match the preview behavior (blend mode, transforms, etc.)
+  // and clip it to the QR area so it doesn't bleed into title/caption.
+  if (s.bgText) {
+    // QR frame area boundaries
+    const wmX = bw;
+    const wmY = bw + titleH + titleGap;
+    const wmW = innerW;
+    const wmH = innerH;
+
+    const wmCanvas = document.createElement('canvas');
+    wmCanvas.width = wmW;
+    wmCanvas.height = wmH;
+    const wmCtx = wmCanvas.getContext('2d')!;
+
+    wmCtx.globalAlpha = s.bgTextOpacity;
+    wmCtx.globalCompositeOperation = (s.bgTextBlendMode === 'normal' ? 'source-over' : s.bgTextBlendMode) as GlobalCompositeOperation;
+    wmCtx.font = `${s.bgTextFontWeight} ${s.bgTextFontSize * scale}px ${s.bgTextFontFamily}`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ('letterSpacing' in wmCtx) (wmCtx as any).letterSpacing = `${s.bgTextLetterSpacing * scale}px`;
+    wmCtx.fillStyle = s.bgTextColor;
+
+    let displayText = s.bgText;
+    if (s.bgTextTextTransform === 'uppercase') displayText = s.bgText.toUpperCase();
+    else if (s.bgTextTextTransform === 'lowercase') displayText = s.bgText.toLowerCase();
+    else if (s.bgTextTextTransform === 'capitalize') displayText = s.bgText.replace(/\b\w/g, (c) => c.toUpperCase());
+
+    if (s.bgTextRepeat) {
+      const tw = wmCtx.measureText(displayText).width + 30 * scale;
+      const th = s.bgTextFontSize * scale * 1.8;
+      wmCtx.translate(wmW / 2, wmH / 2);
+      wmCtx.rotate((s.bgTextRotation * Math.PI) / 180);
+      for (let y = -wmH * 1.5; y < wmH * 1.5; y += th) {
+        for (let x = -wmW * 1.5; x < wmW * 1.5; x += tw) {
+          wmCtx.fillText(displayText, x, y);
+        }
+      }
+    } else {
+      const tx = (s.bgTextX / 100) * wmW;
+      const ty = (s.bgTextY / 100) * wmH;
+      wmCtx.translate(tx, ty);
+      wmCtx.rotate((s.bgTextRotation * Math.PI) / 180);
+      wmCtx.textAlign = 'center';
+      wmCtx.textBaseline = 'middle';
+      wmCtx.fillText(displayText, 0, 0);
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    if (s.borderRadius > 0) {
+      roundRect(ctx, wmX, wmY, wmW, wmH, s.borderRadius * scale);
+    } else {
+      ctx.rect(wmX, wmY, wmW, wmH);
+    }
+    ctx.clip();
+    ctx.drawImage(wmCanvas, wmX, wmY);
+    ctx.restore();
+  }
+
   const mimeMap: Record<ExportFormat, string> = {
     png: 'image/png',
     jpeg: 'image/jpeg',
@@ -219,7 +251,7 @@ async function svgExport(): Promise<{ blob: Blob; filename: string }> {
   const qr = new QRCodeStyling({
     width: s.qrSize * s.exportScale,
     height: s.qrSize * s.exportScale,
-    data: s.inputValue || 'https://example.com',
+    data: s.inputValue || 'https://qr.dariogeorge.in',
     margin: 0,
     type: 'svg',
     qrOptions: { errorCorrectionLevel: s.errorCorrectionLevel },
